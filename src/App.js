@@ -45,12 +45,15 @@ export default function App() {
 			className="App"
 			style={{ "margin-bottom": "10px" }}
 		>
-			<Filter data={statewiseData} />
 			<h1>COVID-19 Dashboard</h1>
 			<h5>
+				{" "}
 				This site does not make any claim on accuracy but depends on
 				api.covid19india.org for data
 			</h5>
+			<hr />
+			<Filter data={statewiseData} />
+
 			<hr />
 			<Timeseries timeseries={timeseries} />
 		</Container>
