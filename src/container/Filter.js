@@ -85,6 +85,7 @@ const Filter = props => {
             Filter States with Confirmed Cases greater than:
           </Typography>
         </Grid>
+
         <Grid item lg={2} md={3} xs={3}>
           <Slider
             valueLabelDisplay="auto"
@@ -94,6 +95,9 @@ const Filter = props => {
             max={500}
             onChangeCommitted={(e, val) => handleChangeFilter(val)}
           />
+        </Grid>
+        <Grid item xs={12}>
+          <hr />
         </Grid>
         {/* <Grid item sm={12} md={12} lg={12} xs={12} xl={12}>
           <BarChart data={props.data} condition={condition} />

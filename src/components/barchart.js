@@ -7,7 +7,8 @@ const BarChart = props => {
 
   const spec = {
     $schema: "https://vega.github.io/schema/vega-lite/v4.json",
-    title: "Confirmed cases by State",
+    title:
+      "Confirmed cases by State (Click on a state to view corresponding details in side chart)",
 
     data: {
       name: "bardata"
@@ -64,25 +65,33 @@ const BarChart = props => {
                 sort: { op: "sum", field: "value", order: "descending" }
               },
               color: {
-                field: "key",
-                type: "nominal",
-                legend: { title: "Case Type" }
+                aggregate: "sum",
+                field: "value",
+                type: "quantitative",
+                legend: null //{ title: "Case Type" }
               },
               tooltip: [
-                { field: "deaths", type: "quantitative" },
-                { field: "recovered", type: "quantitative" },
-                { field: "active", type: "quantitative" },
-                { field: "confirmed", type: "quantitative" },
-                { field: "TotalCases", type: "quantitative" }
+                {
+                  aggregate: "sum",
+                  field: "value",
+                  type: "quantitative",
+                  title: "Confirmed Cases"
+                }
               ]
+              // ,
+              // tooltip: [
+              //   { field: "deaths", type: "quantitative" },
+              //   { field: "recovered", type: "quantitative" },
+              //   { field: "active", type: "quantitative" },
+              //   { field: "confirmed", type: "quantitative" },
+              //   { field: "TotalCases", type: "quantitative" }
+              // ]
             }
           },
           {
             mark: {
               type: "text",
-              align: "left",
-              baseline: "middle",
-              dx: 3
+              align: "right"
             },
             encoding: {
               x: {
@@ -100,6 +109,13 @@ const BarChart = props => {
                 field: "value",
                 type: "quantitative",
                 format: ".0f"
+              },
+              color: {
+                condition: {
+                  test: { aggregate: "sum", field: "value", gt: 700 },
+                  value: "white"
+                },
+                value: "black"
               }
             }
           }
@@ -127,7 +143,8 @@ const BarChart = props => {
           },
           color: {
             field: "key",
-            type: "nominal"
+            type: "nominal",
+            legend: null
           }
         }
       }
@@ -166,6 +183,7 @@ const BarChart = props => {
         document.getElementById("bar_graph").offsetHeight - 10
       );
       results.view.insert("bardata", data).run();
+      window.dispatchEvent(new Event("resize"));
       // results.view.width(
       //   document.getElementById("bar_graph").offsetWidth - 100
       // );

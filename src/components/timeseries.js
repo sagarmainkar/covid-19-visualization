@@ -87,7 +87,11 @@ function TimeSeries(props) {
   };
 
   const graphData = timeseries => {
-    renderChart("#ts_container", spec).then(results => {
+    const opts = {
+      renderer: "svg",
+      actions: false
+    };
+    renderChart("#ts_container", spec, opts).then(results => {
       results.view.width(document.getElementById("ts_container").offsetWidth);
       results.view.height(
         document.getElementById("ts_container").offsetHeight - 10

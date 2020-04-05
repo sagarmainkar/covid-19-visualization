@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./styles.css";
 import axios from "axios";
 import Timeseries from "./components/timeseries";
-import BarChart from "./components/barchart";
 import Filter from "./container/Filter";
 import { Container } from "@material-ui/core";
 
@@ -46,9 +45,6 @@ export default function App() {
       className="App"
       style={{ "margin-bottom": "10px" }}
     >
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-      {/* <BarChart data={statewiseData} /> */}
       <Filter data={statewiseData} />
 
       <hr />
