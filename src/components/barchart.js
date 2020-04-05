@@ -127,6 +127,7 @@ const BarChart = (props) => {
 						field: "key",
 						type: "nominal",
 						sort: { field: "value", order: "descending" },
+						title: "State",
 					},
 					y: {
 						field: "value",
