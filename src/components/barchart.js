@@ -1,195 +1,153 @@
 import React, { useState, useEffect } from "react";
 import renderChart from "vega-embed";
-import { Container } from "@material-ui/core";
+import StateDetailsChart from "./statedetailschart";
 
-const BarChart = (props) => {
-	const [data, setData] = useState(0);
+const StateBarChart = props => {
+  const [data, setData] = useState(0);
+  const [selectedState, setSelectedState] = useState("");
 
-	const spec = {
-		$schema: "https://vega.github.io/schema/vega-lite/v4.json",
-		title:
-			"Confirmed cases by State (Click on a state to view corresponding details in side chart)",
+  const spec = {
+    $schema: "https://vega.github.io/schema/vega-lite/v4.json",
+    title: "Confirmed cases by State",
+    width: "container",
+    height: 500,
+    data: {
+      name: "bardata"
+    },
+    transform: [
+      { calculate: "toNumber(datum.confirmed)", as: "confirmed" },
+      { calculate: "toNumber(datum.active)", as: "active" },
+      { calculate: "toNumber(datum.deaths)", as: "deaths" },
+      { calculate: "toNumber(datum.recovered)", as: "recovered" },
+      {
+        calculate:
+          "toNumber(datum.confirmed) + toNumber(datum.active) +toNumber(datum.recovered)+toNumber(datum.deaths) ",
+        as: "TotalCases"
+      },
+      { fold: ["active", "confirmed", "recovered", "deaths"] },
+      {
+        filter: {
+          and: [
+            { field: "confirmed", gt: props.condition },
+            { not: { field: "statecode", equal: "TT" } }
+          ]
+        }
+      }
+    ],
 
-		data: {
-			name: "bardata",
-		},
-		transform: [
-			{ calculate: "toNumber(datum.confirmed)", as: "confirmed" },
-			{ calculate: "toNumber(datum.active)", as: "active" },
-			{ calculate: "toNumber(datum.deaths)", as: "deaths" },
-			{ calculate: "toNumber(datum.recovered)", as: "recovered" },
+    layer: [
+      {
+        selection: {
+          brush: {
+            type: "single",
+            encodings: ["y"],
+            fields: ["state"],
+            init: { state: "Maharashtra" }
+          }
+        },
+        mark: { type: "bar" },
+        encoding: {
+          x: {
+            aggregate: "sum",
+            field: "value",
+            type: "quantitative",
+            title: "",
 
-			{ fold: ["active", "confirmed", "recovered", "deaths"] },
-			{
-				filter: {
-					and: [
-						{ field: "confirmed", gt: props.condition },
-						{ not: { field: "statecode", equal: "TT" } },
-					],
-				},
-			},
-		],
-		hconcat: [
-			{
-				layer: [
-					{
-						selection: {
-							brush: {
-								type: "single",
-								encodings: ["y"],
-								fields: ["state"],
-								init: { state: "Maharashtra" },
-							},
-						},
-						mark: { type: "bar" },
-						encoding: {
-							x: {
-								field: "confirmed",
-								type: "quantitative",
-								title: "",
+            axis: {
+              grid: false,
+              ticks: false,
+              labels: false
+            }
+          },
+          y: {
+            field: "state",
+            type: "nominal",
+            sort: { op: "sum", field: "value", order: "descending" }
+          },
+          color: {
+            field: "confirmed",
+            type: "quantitative",
+            legend: null
+          },
+          tooltip: [
+            { field: "deaths", type: "quantitative" },
+            { field: "recovered", type: "quantitative" },
+            { field: "active", type: "quantitative" },
+            { field: "confirmed", type: "quantitative" },
+            { field: "TotalCases", type: "quantitative" }
+          ]
+        }
+      },
+      {
+        mark: {
+          type: "text",
+          align: "left",
+          baseline: "middle",
+          dx: 3
+        },
+        encoding: {
+          x: {
+            aggregate: "sum",
+            field: "value",
+            type: "quantitative"
+          },
+          y: {
+            field: "state",
+            type: "nominal",
+            sort: { op: "sum", field: "value", order: "descending" }
+          },
+          text: {
+            aggregate: "sum",
+            field: "value",
+            type: "quantitative",
+            format: ".0f"
+          }
+        }
+      }
+    ]
+  };
 
-								axis: {
-									grid: false,
-									ticks: false,
-									labels: false,
-								},
-							},
-							y: {
-								field: "state",
-								type: "nominal",
-								sort: { field: "confirmed", order: "descending" },
-							},
-							color: {
-								field: "confirmed",
-								type: "quantitative",
-								legend: null, //{ title: "Case Type" }
-							},
-							tooltip: [
-								{
-									field: "confirmed",
-									type: "quantitative",
-									title: "Confirmed Cases",
-								},
-							],
-							// ,
-							// tooltip: [
-							//   { field: "deaths", type: "quantitative" },
-							//   { field: "recovered", type: "quantitative" },
-							//   { field: "active", type: "quantitative" },
-							//   { field: "confirmed", type: "quantitative" },
-							//   { field: "TotalCases", type: "quantitative" }
-							// ]
-						},
-					},
-					{
-						mark: {
-							type: "text",
-							align: "right",
-						},
-						encoding: {
-							x: {
-								field: "confirmed",
-								type: "quantitative",
-							},
-							y: {
-								field: "state",
-								type: "nominal",
-								sort: { field: "confirmed", order: "descending" },
-							},
-							text: {
-								field: "confirmed",
-								type: "quantitative",
-								format: ".0f",
-							},
-							color: {
-								condition: {
-									test: { field: "confirmed", gt: 200 },
-									value: "white",
-								},
-								value: "black",
-							},
-						},
-					},
-				],
-			},
-			{
-				mark: { type: "bar", tooltip: true },
+  useEffect(() => {
+    if (props.data.length > 1) {
+      setData(props.data);
+      setSelectedState(props.data[1].state);
+    }
+  }, [props.data]);
 
-				transform: [
-					{
-						filter: {
-							selection: "brush",
-						},
-					},
-				],
-				encoding: {
-					x: {
-						field: "key",
-						type: "nominal",
-						sort: { field: "value", order: "descending" },
-						title: "State",
-					},
-					y: {
-						field: "value",
-						type: "quantitative",
-					},
-					color: {
-						field: "key",
-						type: "nominal",
-						legend: null,
-					},
-				},
-			},
-		],
-	};
-	useEffect(() => {
-		if (props.data.length > 1) setData(props.data);
-	}, [props.data]);
+  useEffect(() => {
+    console.log("BarChart: useEffect");
+    const opts = {
+      renderer: "svg",
+      actions: false
+    };
 
-	useEffect(() => {
-		const opts = {
-			renderer: "svg",
-			actions: false,
-		};
-		window.onresize = function (event) {
-			renderChart("#bar_graph", spec, opts).then((results) => {
-				let totalWidth = document.getElementById("bar_graph").offsetWidth - 200;
-				const firstGraphWidth = Math.floor(totalWidth * 0.75);
-				const secondGraphWidth = Math.floor(totalWidth - firstGraphWidth);
-				spec.hconcat[0]["width"] = firstGraphWidth;
-				spec.hconcat[1]["width"] = secondGraphWidth;
-				results.view.height(
-					document.getElementById("bar_graph").offsetHeight - 10
-				);
-				results.view.insert("bardata", data).run();
-			});
-		};
+    renderChart("#bar_graph", spec, opts).then(results => {
+      results.view.height(
+        document.getElementById("bar_graph").offsetHeight - 10
+      );
+      results.view.insert("bardata", data).run();
+      results.view.addEventListener("click", (name, value) => {
+        // console.log(value);
+        if (value.datum) {
+          setSelectedState(value.datum.state);
+        }
+      });
+    });
+  });
 
-		renderChart("#bar_graph", spec, opts).then((results) => {
-			let totalWidth = document.getElementById("bar_graph").offsetWidth - 200;
-			const firstGraphWidth = Math.floor(totalWidth * 0.75);
-			const secondGraphWidth = Math.floor(totalWidth - firstGraphWidth);
-			spec.hconcat[0]["width"] = firstGraphWidth;
-			spec.hconcat[1]["width"] = secondGraphWidth;
-			results.view.height(
-				document.getElementById("bar_graph").offsetHeight - 10
-			);
-			results.view.insert("bardata", data).run();
-			window.dispatchEvent(new Event("resize"));
-			// results.view.width(
-			//   document.getElementById("bar_graph").offsetWidth - 100
-			// );
+  return (
+    <div className="container">
+      <div className="row">
+        <div id="bar_graph" className="col-sm-12 col-md-8 col-lg-8" />
 
-			// window.onresize = function(event) {
-			//   results.view.width(
-			//     document.getElementById("bar_graph").offsetWidth - 100
-			//   );
-			//   results.view.run();
-			// };
-		});
-	});
-
-	return <Container id="bar_graph" lg={12} />;
+        <StateDetailsChart
+          state={selectedState}
+          data={data}
+          condition={props.condition}
+        />
+      </div>
+    </div>
+  );
 };
 
-export default BarChart;
+export default StateBarChart;

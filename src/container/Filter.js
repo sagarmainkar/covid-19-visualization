@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
-import BarChart from "../components/barchart";
+import StateBarChart from "../components/barchart";
 
 const Filter = props => {
   const useStyles = makeStyles(theme => ({
@@ -99,11 +99,8 @@ const Filter = props => {
         <Grid item xs={12}>
           <hr />
         </Grid>
-        {/* <Grid item sm={12} md={12} lg={12} xs={12} xl={12}>
-          <BarChart data={props.data} condition={condition} />
-        </Grid> */}
       </Grid>
-      <BarChart data={props.data} condition={condition} />
+      <StateBarChart data={props.data} condition={condition} />
     </div>
   );
 };
