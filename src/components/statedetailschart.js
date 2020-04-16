@@ -47,7 +47,8 @@ const StateDetailsChart = props => {
       },
       color: {
         field: "key",
-        type: "nominal"
+        type: "nominal",
+        legend: null
       }
     }
   };
