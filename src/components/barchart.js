@@ -10,7 +10,7 @@ const StateBarChart = props => {
     $schema: "https://vega.github.io/schema/vega-lite/v4.json",
     title: "Confirmed cases by State",
     width: "container",
-    height: 500,
+    height: 600,
     data: {
       name: "bardata"
     },
@@ -27,10 +27,7 @@ const StateBarChart = props => {
       { fold: ["active", "confirmed", "recovered", "deaths"] },
       {
         filter: {
-          and: [
-            { field: "confirmed", gt: props.condition },
-            { not: { field: "statecode", equal: "TT" } }
-          ]
+          and: [{ not: { field: "statecode", equal: "TT" } }]
         }
       }
     ],
@@ -43,7 +40,8 @@ const StateBarChart = props => {
             encodings: ["y"],
             fields: ["state"],
             init: { state: "Maharashtra" }
-          }
+          },
+          selectbar: { type: "multi" }
         },
         mark: { type: "bar" },
         encoding: {
@@ -68,6 +66,10 @@ const StateBarChart = props => {
             field: "confirmed",
             type: "quantitative",
             legend: null
+          },
+          fillOpacity: {
+            condition: { selection: "selectbar", value: 1 },
+            value: 0.3
           },
           tooltip: [
             { field: "deaths", type: "quantitative" },
@@ -138,13 +140,13 @@ const StateBarChart = props => {
   return (
     <div className="container">
       <div className="row">
-        <div id="bar_graph" className="col-sm-12 col-md-8 col-lg-8" />
+        <div id="bar_graph" className="col-sm-12 col-md-12 col-lg-12" />
 
-        <StateDetailsChart
+        {/* <StateDetailsChart
           state={selectedState}
           data={data}
           condition={props.condition}
-        />
+        />*/}
       </div>
     </div>
   );

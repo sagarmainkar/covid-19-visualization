@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./styles.css";
 import axios from "axios";
 import Timeseries from "./components/timeseries";
-import Filter from "./container/Filter";
-import { Container } from "@material-ui/core";
+import MainContainer from "./container/maincontainer";
 
 export default function App() {
   const [fetched, setFetched] = useState(false);
@@ -48,7 +47,7 @@ export default function App() {
         api.covid19india.org for data
       </h5>
       <hr />
-      <Filter data={statewiseData} />
+      <MainContainer data={statewiseData} />
 
       <hr />
       <Timeseries timeseries={timeseries} />
